@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package com.example.grpc;
+option java_multiple_files = true;
+option java_package = "com.example.grpc";
+
+service StockService {
+  rpc unaryGetStock(StockRequest) returns (StockResponse) {}
+  rpc serverSideStreamingGetStock(StockProductNameRequest) returns (stream StockResponse) {}
+  rpc clientSideStreamingGetStatisticsOfStocks (stream StockRequest) returns (StockStatisticsResponse) {}
+  rpc bidirectionalStreamingGetListOfStocks(stream StockProductNameRequest) returns (stream StockResponse) {}
+}
+
+message StockRequest {
+  int32 id = 1;
+}
+
+message StockProductNameRequest {
+  string prefix = 1;
+}
+
+message StockResponse {
+  int32 id = 1;
+  string productName = 2;
+  double price = 3;
+  int32 offerNumber = 4;
+}
+
+message StockStatisticsResponse{
+  int32 totalValue = 1;
+}
