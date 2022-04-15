@@ -17,6 +17,9 @@ public class HelloController {
   GrpcHelloClientService grpcClientService;
 
   // post http://localhost:8084/test1/hello?name=Atom
+//  @RequestMapping(value = "/hello",
+//      produces = "application/json",
+//      method= RequestMethod.POST)
   @PostMapping("/hello")
   @ResponseBody
   public String sayHello(@RequestParam(value = "name") String name) {
