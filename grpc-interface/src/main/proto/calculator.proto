@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package com.example.grpc;
+
+option java_multiple_files = true;
+option java_package = "com.example.grpc";
+option java_outer_classname = "CalculatorProto";
+
+service CalculatorService {
+
+  // unary
+  rpc findSquare(Input) returns (Output) {};
+
+  // server stream
+  rpc findFactors(Input) returns (stream Output) {};
+
+  // client stream
+  rpc findSum(stream Input) returns (Output) {};
+
+}
+
+message Input {
+  int32 number = 1;
+}
+
+message Output {
+  int64 result = 1;
+}
