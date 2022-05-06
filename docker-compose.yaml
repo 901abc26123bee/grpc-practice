@@ -2,22 +2,22 @@ version: "3.7"
 
 services:
 
-  mysql:
-    container_name: mysql
-    image: mysql/mysql-server:8.0
-    restart: always
-    environment:
-      MYSQL_DATABASE: test
-      MYSQL_USER: tina
-      MYSQL_PASSWORD: 123456
-      MYSQL_ROOT_PASSWORD: 123456
-    ports:
-      - "3310:3306"
-    volumes:
-      - ./sqls:/docker-entrypoint-initdb.d
-    networks:
-      grpc:
-        ipv4_address: 172.16.220.21
+#  mysql:
+#    container_name: mysql
+#    image: mysql/mysql-server:8.0
+#    restart: always
+#    environment:
+#      MYSQL_DATABASE: test
+#      MYSQL_USER: tina
+#      MYSQL_PASSWORD: 123456
+#      MYSQL_ROOT_PASSWORD: 123456
+#    ports:
+#      - "3310:3306"
+#    volumes:
+#      - ./sqls:/docker-entrypoint-initdb.d
+#    networks:
+#      grpc:
+#        ipv4_address: 172.16.240.21
 
 #  server:
 #    image: docker-image-grpc-server
@@ -32,7 +32,7 @@ services:
 #      - mysql
 #    networks:
 #      grpc:
-#        ipv4_address: 172.16.220.22
+#        ipv4_address: 172.16.240.22
 #
 #  web:
 #    image: docker-image-grpc-client
@@ -46,39 +46,39 @@ services:
 #      - server
 #    networks:
 #      grpc:
-#        ipv4_address: 172.16.220.23
+#        ipv4_address: 172.16.240.23
 
-  zipkin:
-    image: openzipkin/zipkin
-    container_name: zipkin
-    ports:
-      - "9411:9411"
-    networks:
-      grpc:
-        ipv4_address: 172.16.220.24
+#  zipkin:
+#    image: openzipkin/zipkin
+#    container_name: zipkin
+#    ports:
+#      - "9411:9411"
+#    networks:
+#      grpc:
+#        ipv4_address: 172.16.240.24
 
   redis_cluster:
     build: ./redis_cluster_context
     #    https://superuser.com/a/1303663
-    #    hack to make redis clsuter call internal node ip route to 127.0.01: netsh int ip add address "Loopback" 172.16.220.10
+    #    hack to make redis clsuter call internal node ip route to 127.0.01: netsh int ip add address "Loopback" 172.16.240.10
     ports:
-#      - "7777:7777"
-#      - "17777:17777"
-      - "7778:7777"
-      - "17778:17777"
+      - "7778:7778"
+      - "17778:17778"
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
     restart: always
-#    "192.168.11.103" should be your host ip if you are using wsl2+ubuntu+docker
-    entrypoint: [ redis-server, /etc/redis/rediscluster.conf, --port,"7777", --cluster-announce-ip,"192.168.11.103" ]
+#    "192.168.11.103" should change to your host ip
+    entrypoint: [ redis-server, /etc/redis/rediscluster.conf, --port,"7778", --cluster-announce-ip,"192.168.11.103" ]
     networks:
       grpc:
-        ipv4_address: 172.16.220.10
+        ipv4_address: 172.16.240.10
     container_name: grpc_redis_cluster
   redis-cluster-creator:
     image: redis:6.0.3
-    entrypoint: [ /bin/sh,-c,'echo "yes" | redis-cli -a pass.123 --cluster create 172.16.220.10:7777 172.16.220.10:7777 172.16.220.10:7777 172.16.220.10:7777 172.16.220.10:7777 172.16.220.10:7777 --cluster-replicas 1' ]
+    entrypoint: [ /bin/sh,-c,'echo "yes" | redis-cli -a pass.123 --cluster create 172.16.240.10:7778 172.16.240.10:7778 172.16.240.10:7778 172.16.240.10:7778 172.16.240.10:7778 172.16.240.10:7778 --cluster-replicas 1' ]
     networks:
       grpc:
-        ipv4_address: 172.16.220.11
+        ipv4_address: 172.16.240.11
     depends_on:
       - redis_cluster
 #  rabbitmq:
@@ -91,7 +91,7 @@ services:
 #      - "15973:15672"
 #    networks:
 #      grpc:
-#        ipv4_address: 172.16.220.12
+#        ipv4_address: 172.16.240.12
 #    container_name: grpc_rabbitmq
 
 networks:
@@ -99,4 +99,6 @@ networks:
     ipam:
       driver: default
       config: # fix the internal IP to avoid redis IP warp causing slave not found
-        - subnet: 172.16.220.0/24
+        - subnet: 172.16.240.0/24
+#          ip_range: 172.16.240.0/24
+#          gateway: 172.16.240.1
